@@ -105,4 +105,5 @@ Function.prototype.aliasMethod = function(new_name, old_name) {
         throw "meta.js: No such method: ${old_name}.";
     }
     this.prototype[new_name] = this.prototype[old_name];
+    return true;
 };
