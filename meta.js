@@ -66,11 +66,6 @@ Function.prototype.new = function(...constructor_args) {
             if (property in target) {
                 return target[property];
             } else {
-                // a.nonexistmethod() 本质上是先访问那个方法再调用它
-                // 因此讲道理拦截以后应该返回 methodMissing 方法
-                // 但是这样就得不到 nonexistmethod 这个名字，因此封装一层方法
-                // 副作用： a.nonexistproperty 得到这个 function 而不是 undefined
-                // 但我觉得问题不是很大
                 return function(...args) {
                     target.methodMissing(property, args);
                 }
@@ -91,7 +86,6 @@ Function.prototype.removeMethod = function(name) {
     if (typeof this.prototype[name] !== typeof Function) { 
         return false;
     }
-    //this.prototype[name] = undefined;
     Reflect.deleteProperty(this.prototype, name);
     return true;
 };
@@ -105,4 +99,5 @@ Function.prototype.aliasMethod = function(new_name, old_name) {
         throw `meta.js: No such method: ${old_name}.`;
     }
     this.prototype[new_name] = this.prototype[old_name];
+    return true;
 };
