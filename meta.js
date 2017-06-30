@@ -63,7 +63,6 @@ Function.prototype.new = function(...constructor_args) {
     // 在内部定义 proxy handler
     const handler = {
         get: function(target, property) {
-            // 顺手实现个私有变量功能
             if (property in target) {
                 return target[property];
             } else {
@@ -80,7 +79,7 @@ Function.prototype.new = function(...constructor_args) {
     };
     let origin = new this(...constructor_args);
     let proxy = new Proxy(origin, handler);
-    proxy.origin = origin;
+    proxy._origin = origin;
     return proxy;
 };
 
@@ -92,7 +91,8 @@ Function.prototype.removeMethod = function(name) {
     if (typeof this.prototype[name] !== typeof Function) { 
         return false;
     }
-    this.prototype[name] = undefined;
+    //this.prototype[name] = undefined;
+    Reflect.deleteProperty(this.prototype, name);
     return true;
 };
 // undefMethod 删除原型链上所有方法，有需要再写
@@ -102,7 +102,7 @@ Function.prototype.removeMethod = function(name) {
 // 别名方法
 Function.prototype.aliasMethod = function(new_name, old_name) {
     if (typeof this.prototype[old_name] !== typeof Function) { 
-        throw "meta.js: No such method: ${old_name}.";
+        throw `meta.js: No such method: ${old_name}.`;
     }
     this.prototype[new_name] = this.prototype[old_name];
 };
