@@ -95,7 +95,7 @@ class Entity {
 let e = Entity.new();
 e.arbitrarymethod(1,2,3);   // => "call method arbitrarymethod with args: 1,2,3"
 ```
-It's implements by Proxy in es6, so use `new Entity()` will lose this feature. You can also use `e._origin` to get the object behind proxy.
+It's implemented by Proxy in es6, so use `new Entity()` will lose this feature. You can also use `e._origin` to get the object behind proxy.
 The side effect is, because function is also a propery of object in Javascript, call `e.arbitraryproperty` will get a function rather than *undefined*.
 
 ##  
