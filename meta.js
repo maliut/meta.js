@@ -58,13 +58,15 @@ Reflect.defineProperty(Function.prototype, "superclass", {
 // methodMissing
 // 需要 proxy 实现
 // 本来想通过改原型对象 object.prototype 但是不行，所以利用工厂方法
-// 利用 A.new() 生成对象， .origin 属性可以得到内部的真实对象 
+// 利用 A.new() 生成对象， ._origin 属性可以得到内部的真实对象 
 Function.prototype.new = function(...constructor_args) {
     // 在内部定义 proxy handler
     const handler = {
         get: function(target, property) {
             if (property in target) {
                 return target[property];
+            } else if (!target.respondToMissing(property)) {
+                return undefined;
             } else {
                 return function(...args) {
                     target.methodMissing(property, args);
@@ -78,8 +80,15 @@ Function.prototype.new = function(...constructor_args) {
     return proxy;
 };
 
-// respond_to, respond_to_missing
-// 有需要再写
+// respondToMissing
+// 复写 methodMissing 时也要复写此方法，这样可以在调用不存在的方法时正确返回 undefined
+Object.prototype.respondToMissing = function(property) {
+    return false;
+}
+
+Object.prototype.respondTo = function(property) {
+    return property in this || this.respondToMissing(property);
+}
 
 // 删除方法
 Function.prototype.removeMethod = function(name) {
@@ -89,9 +98,8 @@ Function.prototype.removeMethod = function(name) {
     Reflect.deleteProperty(this.prototype, name);
     return true;
 };
-// undefMethod 删除原型链上所有方法，有需要再写
 
-// 类宏：不支持
+// undefMethod 删除原型链上所有方法，有需要再写
 
 // 别名方法
 Function.prototype.aliasMethod = function(new_name, old_name) {

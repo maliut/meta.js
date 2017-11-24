@@ -89,12 +89,16 @@ class Entity {
   methodMissing(name, args) {
     console.log(`call method ${name} with args: ${args.join(',')}`);
   }
+  
+  responedToMissing(name) {
+    return true;
+  }
 }
 let e = Entity.new();
 e.arbitrarymethod(1,2,3);   // => "call method arbitrarymethod with args: 1,2,3"
 ```
 幽灵方法是通过 es6 的 proxy 实现的，因此使用 `new Entity()` 得到的对象不包含这个特性。你也可以使用 `e._origin` 得到背后的对象。
-幽灵方法的一个副作用是，由于 Javascript 中属性和方法是一样的，调用 `e.arbitraryproperty` 会得到一个 function 而不是 undefined 。
+确保同时重载 `responedToMissing` ，为 methodMissing 想要处理的方法返回 true 。这样可以为 methodMissing 不想处理的方法和属性正确返回 undefined 。
 
 ##  
 meta.js 的代码十分简单，如有问题或建议欢迎 issue 或 pull request 。
